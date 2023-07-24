@@ -28,6 +28,7 @@ async function run() {
         const usersCollection = client.db("collegeAdmissionDB").collection("users")
         const collegesCollection = client.db("collegeAdmissionDB").collection("colleges")
         const cartCollection = client.db("collegeAdmissionDB").collection("carts")
+        const submissionsCollection = client.db("collegeAdmissionDB").collection("submissions")
         const reviewsCollection = client.db("collegeAdmissionDB").collection("reviews")
 
         // ======User related api============// 
@@ -81,6 +82,23 @@ async function run() {
         //=========== college api's=============// 
         app.get('/colleges', async (req, res) => {
             const result = await collegesCollection.find().toArray()
+            res.send(result)
+        })
+
+        // ==== add my submission and show them in my college route api's======
+
+        app.get('/submissions', async (req, res) => {
+            const userEmail = req.query.email
+            if (!userEmail) {
+                return res.status(400).send({ error: true, message: "User email is missing" })
+            }
+            const query = { userEmail: userEmail }
+            const result = await submissionsCollection.find(query).toArray()
+            res.send(result)
+        })
+        app.post('/submissions', async (req, res) => {
+            const newSubmission = req.body
+            const result = await submissionsCollection.insertOne(newSubmission)
             res.send(result)
         })
 
